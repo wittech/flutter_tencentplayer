@@ -5,23 +5,24 @@ class TencentPlayerValue {
   final Duration position;
   final Duration playable;
   final bool isPlaying;
-  final String errorDescription;
-  final Size size;
+  final String? errorDescription;
+  final Size? size;
   final bool isLoading;
-  final int netSpeed;
+  final int? netSpeed;
+  final int? fps;
   final double rate;
   final int bitrateIndex;
   final int orientation;
   final int degree;
-  final int eventCode;
+  final int? eventCode;
 
   bool get initialized => size?.width != null;
 
   bool get hasError => errorDescription != null;
 
   double get aspectRatio => size != null
-      ? size.width / size.height > 0.0
-          ? size.width / size.height
+      ? size!.width / size!.height > 0.0
+          ? size!.width / size!.height
           : 1.0
       : 1.0;
 
@@ -34,6 +35,7 @@ class TencentPlayerValue {
     this.size,
     this.isLoading = false,
     this.netSpeed,
+    this.fps = 0,
     this.rate = 1.0,
     this.bitrateIndex = 0, //TODO 默认清晰度
     this.orientation = 0,
@@ -42,19 +44,20 @@ class TencentPlayerValue {
   });
 
   TencentPlayerValue copyWith({
-    Duration duration,
-    Duration position,
-    Duration playable,
-    bool isPlaying,
-    String errorDescription,
-    Size size,
-    bool isLoading,
-    int netSpeed,
-    double rate,
-    int bitrateIndex,
-    int orientation,
-    int degree,
-    int eventCode,
+    Duration? duration,
+    Duration? position,
+    Duration? playable,
+    bool? isPlaying,
+    String? errorDescription,
+    Size? size,
+    bool? isLoading,
+    int? netSpeed,
+    int? fps,
+    double? rate,
+    int? bitrateIndex,
+    int? orientation,
+    int? degree,
+    int? eventCode,
   }) {
     return TencentPlayerValue(
       duration: duration ?? this.duration,
@@ -70,6 +73,7 @@ class TencentPlayerValue {
       orientation: orientation ?? this.orientation,
       degree: degree ?? this.degree,
       eventCode: eventCode ?? this.eventCode,
+      fps: fps ?? this.fps,
     );
   }
 
@@ -83,6 +87,7 @@ class TencentPlayerValue {
         'errorDescription: $errorDescription),'
         'isLoading: $isLoading),'
         'netSpeed: $netSpeed),'
+        'fps: $fps),'
         'rate: $rate),'
         'bitrateIndex: $bitrateIndex),'
         'orientation: $orientation),'

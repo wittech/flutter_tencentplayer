@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_tencentplayer/flutter_tencentplayer.dart';
 
 class TencentPlayerController extends ValueNotifier<TencentPlayerValue> {
-  int _textureId;
-  final String dataSource;
+  int? _textureId;
+  final String? dataSource;
   final DataSourceType dataSourceType;
   final PlayerConfig playerConfig;
   MethodChannel channel = TencentPlayer.channel;
@@ -27,16 +27,16 @@ class TencentPlayerController extends ValueNotifier<TencentPlayerValue> {
         super(TencentPlayerValue());
 
   bool _isDisposed = false;
-  Completer<void> _creatingCompleter;
-  StreamSubscription<dynamic> _eventSubscription;
-  _VideoAppLifeCycleObserver _lifeCycleObserver;
+  Completer<void>? _creatingCompleter;
+  StreamSubscription<dynamic>? _eventSubscription;
+  _VideoAppLifeCycleObserver? _lifeCycleObserver;
 
-  int get textureId => _textureId;
+  int? get textureId => _textureId;
 
   Future<void> initialize() async {
     if (this.playerConfig.supportBackground == false) {
       _lifeCycleObserver = _VideoAppLifeCycleObserver(this);
-      _lifeCycleObserver.initialize();
+      _lifeCycleObserver!.initialize();
     }
     _creatingCompleter = Completer<void>();
     Map<dynamic, dynamic> dataSourceDescription;
@@ -51,13 +51,13 @@ class TencentPlayerController extends ValueNotifier<TencentPlayerValue> {
     }
     value = value.copyWith(isPlaying: playerConfig.autoPlay);
     dataSourceDescription.addAll(playerConfig.toJson());
-    final Map<String, dynamic> response =
+    final Map<String, dynamic>? response =
         await channel.invokeMapMethod<String, dynamic>(
       'create',
       dataSourceDescription,
     );
-    _textureId = response['textureId'];
-    _creatingCompleter.complete(null);
+    _textureId = response!['textureId'];
+    _creatingCompleter!.complete(null);
     final Completer<void> initializingCompleter = Completer<void>();
 
     void eventListener(dynamic event) {
@@ -112,9 +112,12 @@ class TencentPlayerController extends ValueNotifier<TencentPlayerValue> {
           );
           break;
         case 'netStatus':
-          if (value.netSpeed == map['netSpeed']) return;
+          int fps = map['fps'].toInt();
+          // 忽略小于3的帧率浮动
+          if (value.netSpeed == map['netSpeed'] && (value.fps! - fps).abs() < 3) return;
           value = value.copyWith(
             netSpeed: map['netSpeed'],
+            fps: fps,
             eventCode: curCode,
           );
           break;
@@ -138,7 +141,7 @@ class TencentPlayerController extends ValueNotifier<TencentPlayerValue> {
       }
     }
 
-    _eventSubscription = _eventChannelFor(_textureId)
+    _eventSubscription = _eventChannelFor(_textureId!)
         .receiveBroadcastStream()
         .listen(eventListener);
     return initializingCompleter.future;
@@ -151,7 +154,7 @@ class TencentPlayerController extends ValueNotifier<TencentPlayerValue> {
   @override
   Future dispose() async {
     if (_creatingCompleter != null) {
-      await _creatingCompleter.future;
+      await _creatingCompleter!.future;
       if (!_isDisposed) {
         _isDisposed = true;
         await _eventSubscription?.cancel();
@@ -243,7 +246,7 @@ class _VideoAppLifeCycleObserver with WidgetsBindingObserver {
   _VideoAppLifeCycleObserver(this._controller);
 
   void initialize() {
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
   }
 
   @override
@@ -263,6 +266,6 @@ class _VideoAppLifeCycleObserver with WidgetsBindingObserver {
   }
 
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
   }
 }

@@ -1,4 +1,20 @@
 #
+## 1.1.0
+1. 新增视频帧率回调
+
+## 1.0.0
+1. 更新sdk android: 8.6.10097  ios: 8.6.10094
+
+## 0.16.0
+1. fix sign判空
+
+## 0.15.0
+1. fix网络视频旋转
+
+## 0.14.0
+1. 添加参数sign
+2. 支持Null safety
+
 ## 0.13.0
 1. 更新sdk android: 8.2.9809  ios: 8.2.9808
 2. 修复android progressIntervald单位
